@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Zettbos Web App Wrapper">
+    <meta name="theme-color" content="#151b26">
+    <title>RECARE HSE System</title>
+    <style>
+        /* Zettbos Theme - Dark Mode & Neon Green */
+        :root {
+            --bg-color: #151b26;
+            --neon-green: #00ffaa;
+            --text-light: #e0e0e0;
+        }
+
+        /* Reset & Base Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            overflow: hidden; /* Mencegah double scrollbar dari browser */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Loading Screen UI */
+        .loader-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 1;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(0, 255, 170, 0.15);
+            border-top-color: var(--neon-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            color: var(--neon-green);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Iframe Styling */
+        iframe {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100vh;
+            border: none;
+            background-color: transparent; /* Transparan selama loading */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .iframe-loaded {
+            opacity: 1;
+            background-color: #ffffff; /* Fallback warna jika app target tidak punya background */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Animation -->
+    <div class="loader-container" id="loader">
+        <div class="spinner"></div>
+        <span class="loader-text">Memuat Sistem...</span>
+    </div>
+
+    <!-- Iframe Wrapper Target Link Apps Script -->
+    <iframe 
+        id="appFrame"
+        src="https://script.google.com/macros/s/AKfycbz68Vgng9kRfLpjYXBT4r1Hk8ScRtdxPTv7Hg-mXRmYqVIxGlHLY5bx0WRbC30VsTqP/exec" 
+        allow="camera; microphone; fullscreen; geolocation; clipboard-read; clipboard-write"
+        allowfullscreen>
+    </iframe>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const iframe = document.getElementById('appFrame');
+            const loader = document.getElementById('loader');
+
+            // Fungsi untuk menghapus loader dan menampilkan iframe
+            function showApp() {
+                if (loader.style.display !== 'none') {
+                    loader.style.display = 'none';
+                    iframe.classList.add('iframe-loaded');
+                }
+            }
+
+            // Trigger saat iframe sukses dimuat
+            iframe.onload = function() {
+                showApp();
+            };
+
+            // Fallback Timeout: 
+            // Kadang Google Apps Script memblokir event `onload` cross-origin.
+            // Timer 4 detik ini memastikan UI tetap tampil meski event tidak terdeteksi.
+            setTimeout(() => {
+                showApp();
+            }, 4000);
+        });
+    </script>
+</body>
+</html>
